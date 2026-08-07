@@ -2,7 +2,7 @@
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { Search, FileText, CheckCircle2, AlertTriangle, Paperclip, MessageCircle } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function Reports() {
   const { triggerToast, token } = useOutletContext();
@@ -433,7 +433,7 @@ export default function Reports() {
                 إغلاق المعاينة
               </button>
                   <a  
-                href={`http://localhost:5000/uploads/${selectedAttachment.filename}`}
+                href={`${import.meta.env.VITE_API_URL}/uploads/${selectedAttachment.filename}`}
                 download
                 target="_blank"
                 rel="noopener noreferrer"

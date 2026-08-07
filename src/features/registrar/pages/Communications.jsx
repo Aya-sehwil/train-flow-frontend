@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { Send, Search, MessageSquare } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 const getHeaders = () => ({
   'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -71,7 +71,7 @@ const messagesContainerRef = useRef(null);
 
   useEffect(() => {
     if (!user || !token) return;
-    const socket = io('http://localhost:5000');
+    const socket = io(`${import.meta.env.VITE_API_URL}`);
 
     socket.on('connect', () => {
       socket.emit('join', { userId: user.id, role: user.role });

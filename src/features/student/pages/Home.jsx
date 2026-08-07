@@ -6,7 +6,7 @@ import UpdatesWidget from '../components/UpdatesWidget';
 import ScheduleCalendar from '../components/ScheduleCalendar';
 import { Calendar, Clock, FileText, AlertTriangle, XCircle } from 'lucide-react';
 
-const API = 'http://localhost:5000/api';
+const API = `${import.meta.env.VITE_API_URL}/api`;
 
 const getHeaders = () => ({
   'Authorization': `Bearer ${localStorage.getItem('token')}`,

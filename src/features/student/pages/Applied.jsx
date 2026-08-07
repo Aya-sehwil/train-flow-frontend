@@ -2,7 +2,7 @@
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { ClipboardList, Building2, XCircle } from 'lucide-react';
 
-const API = 'http://localhost:5000/api';
+const API = `${import.meta.env.VITE_API_URL}/api`;
 
 const getHeaders = () => ({
   'Authorization': `Bearer ${localStorage.getItem('token')}`,

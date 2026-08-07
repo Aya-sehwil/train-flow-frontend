@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Mail, Phone, MapPin, Users, FileText, Camera } from 'lucide-react';
 
-const SERVER_BASE = 'http://localhost:5000';
+const SERVER_BASE = `${import.meta.env.VITE_API_URL}`;
 const API = `${SERVER_BASE}/api`;
 
 const getHeaders = () => ({

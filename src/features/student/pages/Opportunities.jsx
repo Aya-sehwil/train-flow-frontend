@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Search, MapPin, Loader } from 'lucide-react';
 
-const API = 'http://localhost:5000/api/student';
+const API = `${import.meta.env.VITE_API_URL}/api/student`;
 
 // ألوان ثابتة للوغو حسب الـ index
 const logoStyles = [

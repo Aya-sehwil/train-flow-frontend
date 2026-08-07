@@ -3,8 +3,8 @@ import { useOutletContext } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { Search, Download, User, FileSpreadsheet, Paperclip } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
-const SERVER_ORIGIN = 'http://localhost:5000';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+const SERVER_ORIGIN = `${import.meta.env.VITE_API_URL}`;
 
 const getHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`,

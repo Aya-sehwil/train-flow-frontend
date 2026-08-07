@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { Send, Search } from 'lucide-react';
 
-const API = 'http://localhost:5000/api';
+const API = `${import.meta.env.VITE_API_URL}/api`;
 
 const getHeaders = () => ({
   'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -69,7 +69,7 @@ export default function Communication() {
 
   useEffect(() => {
     if (!user) return;
-    const socket = io('http://localhost:5000');
+    const socket = io(`${import.meta.env.VITE_API_URL}`);
 
     socket.on('connect', () => {
       socket.emit('join', { userId: user.id, role: 'student' });

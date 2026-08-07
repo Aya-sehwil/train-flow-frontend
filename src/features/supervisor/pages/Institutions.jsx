@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Building2, Plus, Search, SlidersHorizontal, Mail, Pencil } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 const sectorOptions = [
   'قطاع البرمجيات والتقنية',
@@ -213,7 +213,7 @@ export default function Institutions() {
                  {inst.logo ? (
                       <div className="h-11 w-11 rounded-2xl flex items-center justify-center shrink-0 shadow-sm overflow-hidden bg-white border border-gray-150">
                         <img
-                          src={inst.logo.startsWith('/') ? `http://localhost:5000${inst.logo}` : inst.logo}
+                          src={inst.logo.startsWith('/') ? `${import.meta.env.VITE_API_URL}${inst.logo}` : inst.logo}
                           alt={inst.name}
                           className="h-full w-full object-cover"
                         />

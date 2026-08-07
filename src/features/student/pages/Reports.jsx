@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Plus, Search, FileText, Send, Paperclip, Loader } from 'lucide-react';
 
-const API = 'http://localhost:5000/api';
+const API = `${import.meta.env.VITE_API_URL}/api`;
 
 // عدد أسابيع التدريب المتاحة بالقائمة المنسدلة - عدليه لو مدة التدريب عندك مختلفة
 const WEEK_OPTIONS = Array.from({ length: 20 }, (_, i) => `الأسبوع ${i + 1}`);

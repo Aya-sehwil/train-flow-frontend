@@ -762,7 +762,7 @@ export default function SupervisorModals({
                 إغلاق المعاينة
               </button>
               <a
-                href={`http://localhost:5000/uploads/${selectedAttachment.filename}`}
+                href={`${import.meta.env.VITE_API_URL}/uploads/${selectedAttachment.filename}`}
                 download
                 target="_blank"
                 rel="noopener noreferrer"

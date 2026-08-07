@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { FileText, Clock, ClipboardList, CheckCircle2, XCircle, Search } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function Applications() {
   const { triggerToast, token } = useOutletContext();

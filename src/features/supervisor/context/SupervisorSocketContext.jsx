@@ -7,7 +7,7 @@ export function useSupervisorSocket() {
   return useContext(SupervisorSocketContext);
 }
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 const notifTypeMap = {
   approval_request: 'request',
@@ -82,7 +82,7 @@ export function SupervisorSocketProvider({ user, token, triggerToast, children }
   // اتصال الـ socket الوحيد لكل لوحة تحكم المشرف
   useEffect(() => {
     if (!user || !token) return;
-    const socket = io('http://localhost:5000');
+    const socket = io(`${import.meta.env.VITE_API_URL}`);
     socketRef.current = socket;
     setSocketTick((t) => t + 1);
 
