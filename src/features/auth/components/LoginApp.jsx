@@ -23,7 +23,7 @@ export default function LoginApp() {
 
   const handleLoginSubmit = async (data) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: data.email, password: data.password })
@@ -47,7 +47,7 @@ export default function LoginApp() {
 
   const handleRegisterSubmit = async (data) => {
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -68,7 +68,7 @@ export default function LoginApp() {
 
   const handleForgotPasswordSubmit = async (data) => {
     try {
-      const response = await fetch('/api/auth/send-code', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/send-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: data.email })
@@ -88,7 +88,7 @@ export default function LoginApp() {
 
   const handleOtpSubmit = async (data) => {
     try {
-      const response = await fetch('/api/auth/verify-code', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, code: data.code })
@@ -108,7 +108,7 @@ export default function LoginApp() {
 
   const handleResetPasswordSubmit = async (data) => {
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resetToken, password: data.password })

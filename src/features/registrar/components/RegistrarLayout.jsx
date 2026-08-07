@@ -99,7 +99,7 @@ export default function RegistrarDashboard() {
 
     setStaffSubmitting(true);
     try {
-      const response = await fetch('/api/auth/create-staff', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/create-staff`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
