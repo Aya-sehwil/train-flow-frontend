@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-purple: #4d44b5;
+  --color-brand-purpleLight: #655cb8;
+  --color-brand-purpleDark: #3b3494;
+  --color-brand-bg: #f8f9fd;
+  --color-brand-textGray: #a0aec0;
+  --color-brand-textDark: #1a202c;
+  
+  --font-cairo: "Cairo", sans-serif;
+  
+  --radius-common: 24px;
+  --radius-inner: 16px;
+  --shadow-common: 0 4px 20px rgba(0, 0, 0, 0.02);
+  --shadow-hover: 0 10px 30px rgba(77, 68, 181, 0.05);
+}
+
+@utility animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+  @apply font-cairo bg-brand-bg text-brand-textDark antialiased;
+}
+
+/* Override browser default autofill background and text colors */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #1a202c !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Custom sleek scrollbar styling (light line on the side) */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+
