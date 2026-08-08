@@ -120,12 +120,6 @@ useEffect(() => {
             ابحث وتقدم للوظائف التدريبية الميدانية التي تتوافق مع تخصصك الاكاديمي
           </p>
         </div>
-        <div>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#eefaf3] text-green-600 text-xs font-bold rounded-full border border-[#dcf5e7]">
-            <div className="h-2 w-2 rounded-full bg-green-500 shrink-0" />
-            <span>الحالة: قيد المباشرة والتدريب</span>
-          </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
