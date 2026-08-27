@@ -35,6 +35,8 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [errors, setErrors] = useState({});
   const [passwordTouched, setPasswordTouched] = useState(false);
+  // حماية من الضغط المتكرر/دبل-كليك على زر الإرسال (race condition عند التسجيل)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEmailChange = (value) => {
     setEmail(value);
@@ -104,16 +106,26 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      onSubmit({
+
+    // حماية أساسية: لو في طلب شغال أصلاً، تجاهلي أي ضغطة إضافية على الزر
+    if (isSubmitting) return;
+
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
         name: username,
         university_id: universityId,
         email,
         password,
         role
       });
+    } finally {
+      // نرجع نفعّل الزر دايماً (نجح الطلب أو فشل) عشان المستخدم يقدر يصحح ويعيد المحاولة
+      setIsSubmitting(false);
     }
   };
 
@@ -135,7 +147,8 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="محمد علي"
-              className={`w-full bg-white px-4 py-2.5 pr-10 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 ${
+              disabled={isSubmitting}
+              className={`w-full bg-white px-4 py-2.5 pr-10 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${
                 errors.username
                   ? 'border-red-500 focus:ring-red-200'
                   : 'border-gray-200 focus:ring-purple-200 focus:border-brand-purple'
@@ -163,7 +176,8 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
               onChange={(e) => handleUniversityIdChange(e.target.value)}
               placeholder="4410023450 (10 أرقام)"
               maxLength={10}
-              className={`w-full bg-white px-4 py-2.5 pr-10 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 ${
+              disabled={isSubmitting}
+              className={`w-full bg-white px-4 py-2.5 pr-10 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${
                 errors.universityId
                   ? 'border-red-500 focus:ring-red-200'
                   : 'border-gray-200 focus:ring-purple-200 focus:border-brand-purple'
@@ -193,7 +207,8 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
               onChange={(e) => handleEmailChange(e.target.value)}
               onBlur={() => setTimeout(() => setShowEmailSuggestions(false), 150)}
               placeholder="example123@gmail.com"
-              className={`w-full bg-white px-4 py-2.5 pr-10 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 ${
+              disabled={isSubmitting}
+              className={`w-full bg-white px-4 py-2.5 pr-10 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${
                 errors.email
                   ? 'border-red-500 focus:ring-red-200'
                   : 'border-gray-200 focus:ring-purple-200 focus:border-brand-purple'
@@ -238,7 +253,8 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
               onChange={(e) => setPassword(e.target.value)}
               onFocus={() => setPasswordTouched(true)}
               placeholder="••••••••••••"
-              className={`w-full bg-white px-10 py-2.5 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 ${
+              disabled={isSubmitting}
+              className={`w-full bg-white px-10 py-2.5 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${
                 errors.password
                   ? 'border-red-500 focus:ring-red-200'
                   : 'border-gray-200 focus:ring-purple-200 focus:border-brand-purple'
@@ -295,7 +311,8 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••••••"
-              className={`w-full bg-white px-10 py-2.5 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 ${
+              disabled={isSubmitting}
+              className={`w-full bg-white px-10 py-2.5 border rounded-2xl text-right text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${
                 errors.confirmPassword
                   ? 'border-red-500 focus:ring-red-200'
                   : 'border-gray-200 focus:ring-purple-200 focus:border-brand-purple'
@@ -328,6 +345,7 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
                   type="checkbox"
                   checked={agreeTerms}
                   onChange={() => setAgreeTerms(!agreeTerms)}
+                  disabled={isSubmitting}
                   className="sr-only"
                 />
                 <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${
@@ -361,9 +379,10 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-3 px-4 bg-brand-purple text-white font-semibold rounded-2xl shadow-lg shadow-purple-200 hover:bg-brand-purpleDark focus:outline-none focus:ring-2 focus:ring-purple-400 active:scale-[0.98] transition-all duration-200"
+          disabled={isSubmitting}
+          className="w-full py-3 px-4 bg-brand-purple text-white font-semibold rounded-2xl shadow-lg shadow-purple-200 hover:bg-brand-purpleDark focus:outline-none focus:ring-2 focus:ring-purple-400 active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
         >
-          إنشاء الحساب
+          {isSubmitting ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
         </button>
 
         {/* Link back to login */}
@@ -372,6 +391,7 @@ export default function RegisterScreen({ onNavigate, onSubmit }) {
           <button
             type="button"
             onClick={() => onNavigate('login')}
+            disabled={isSubmitting}
             className="text-brand-purple font-semibold hover:underline hover:text-brand-purpleDark transition"
           >
             تسجيل الدخول

@@ -13,14 +13,6 @@ const getHeaders = () => ({
 // خريطة مبدئية: كل كلية وتخصصاتها. لاحقاً بتصير هاي البيانات جاية من الجامعة مباشرة.
 const COLLEGE_MAJORS = {
   'كلية  الادارة والتمويل ': ['محاسبة ', 'ادارة اعمال ', ' نظم معلومات ادارية '],
-  // 'كلية تكنولوجيا المعلومات': ['علوم حاسوب', 'نظم معلومات', 'أمن سيبراني', 'ذكاء اصطناعي', 'شبكات حاسوب'],
-  // 'كلية إدارة الأعمال': ['إدارة أعمال', 'محاسبة', 'تسويق', 'تمويل ومصارف', 'إدارة موارد بشرية'],
-  // 'كلية العلوم': ['رياضيات', 'فيزياء', 'كيمياء', 'أحياء', 'إحصاء'],
-  // 'كلية الآداب': ['لغة إنجليزية', 'لغة عربية', 'تاريخ', 'جغرافيا', 'علم اجتماع'],
-  // 'كلية التربية': ['معلم صف', 'رياض أطفال', 'تربية خاصة', 'تكنولوجيا تعليم'],
-  // 'كلية الطب': ['طب عام', 'طب أسنان', 'تمريض', 'علاج طبيعي'],
-  // 'كلية الصيدلة': ['صيدلة'],
-  // 'كلية الحقوق': ['قانون'],
 };
 
 const COLLEGES = Object.keys(COLLEGE_MAJORS);
@@ -39,21 +31,29 @@ export default function Users() {
   const [savingAcademicInfo, setSavingAcademicInfo] = useState(false);
   const [isEditingAcademicInfo, setIsEditingAcademicInfo] = useState(false);
 
-  const loadData = () => {
+  // بتاخد آيدي الطالب يلي بدنا نظل عليه بعد إعادة التحميل (لو موجود)
+  // لو ما انبعت شي (أول تحميل)، بترجع تختار أول طالب باللستة زي السابق
+  const loadData = (keepSelectedId = null) => {
     setLoading(true);
     Promise.all([
       fetch(`${API_BASE_URL}/registrar/students`, { headers: getHeaders() }).then(r => r.json()),
       fetch(`${API_BASE_URL}/registrar/supervisors`, { headers: getHeaders() }).then(r => r.json()),
     ])
       .then(([studentsRes, supervisorsRes]) => {
-      if (studentsRes.success) {
+        if (studentsRes.success) {
           setStudents(studentsRes.data);
+
           if (studentsRes.data.length > 0) {
-            setSelectedStudentId(studentsRes.data[0].student_id);
-            setSelectedSupervisorId(studentsRes.data[0].supervisor_id || '');
-            setMajor(studentsRes.data[0].major || '');
-            setCollege(studentsRes.data[0].college || '');
-            setIsEditingAcademicInfo(!studentsRes.data[0].major);
+            // لو معنا آيدي نحافظ عليه ولسا موجود باللستة الجديدة، استخدميه، وإلا ارجعي لأول طالب
+            const targetStudent =
+              (keepSelectedId && studentsRes.data.find(s => s.student_id === keepSelectedId))
+              || studentsRes.data[0];
+
+            setSelectedStudentId(targetStudent.student_id);
+            setSelectedSupervisorId(targetStudent.supervisor_id || '');
+            setMajor(targetStudent.major || '');
+            setCollege(targetStudent.college || '');
+            setIsEditingAcademicInfo(!targetStudent.major);
           }
         }
         if (supervisorsRes.success) setSupervisors(supervisorsRes.data);
@@ -69,13 +69,13 @@ export default function Users() {
 
   const selectedStudent = students.find(s => s.student_id === selectedStudentId);
 
-const handleSelectStudent = (student) => {
-  setSelectedStudentId(student.student_id);
-  setSelectedSupervisorId(student.supervisor_id || '');
-  setCollege(student.college || '');
-  setMajor(student.major || '');
-  setIsEditingAcademicInfo(!student.major); // لو ما عنده تخصص أصلاً، افتحلها بوضع التعديل تلقائياً
-};
+  const handleSelectStudent = (student) => {
+    setSelectedStudentId(student.student_id);
+    setSelectedSupervisorId(student.supervisor_id || '');
+    setCollege(student.college || '');
+    setMajor(student.major || '');
+    setIsEditingAcademicInfo(!student.major); // لو ما عنده تخصص أصلاً، افتحلها بوضع التعديل تلقائياً
+  };
 
   const handleAssignSupervisor = async (e) => {
     e.preventDefault();
@@ -90,11 +90,11 @@ const handleSelectStudent = (student) => {
         headers: getHeaders(),
         body: JSON.stringify({ supervisor_id: selectedSupervisorId }),
       });
-     const data = await res.json();
+      const data = await res.json();
       if (data.success) {
         triggerToast(data.message);
         setIsEditingAcademicInfo(false);
-        loadData();
+        loadData(selectedStudentId); // ← نحافظ على نفس الطالب المحدد
       } else {
         triggerToast(data.message, 'error');
       }
@@ -121,7 +121,8 @@ const handleSelectStudent = (student) => {
       const data = await res.json();
       if (data.success) {
         triggerToast(data.message);
-        loadData();
+        setIsEditingAcademicInfo(false); // نرجع لوضع العرض بعد نجاح الحفظ
+        loadData(selectedStudentId); // ← نحافظ على نفس الطالب المحدد
       } else {
         triggerToast(data.message, 'error');
       }
@@ -133,15 +134,15 @@ const handleSelectStudent = (student) => {
   };
 
   const handleCollegeChange = (newCollege) => {
-  setCollege(newCollege);
-  // لو التخصص الحالي مش تابع للكلية الجديدة، نصفّره حتى ما يضل تخصص من كلية تانية
-  const majorsForCollege = COLLEGE_MAJORS[newCollege] || [];
-  if (!majorsForCollege.includes(major)) {
-    setMajor('');
-  }
-};
+    setCollege(newCollege);
+    // لو التخصص الحالي مش تابع للكلية الجديدة، نصفّره حتى ما يضل تخصص من كلية تانية
+    const majorsForCollege = COLLEGE_MAJORS[newCollege] || [];
+    if (!majorsForCollege.includes(major)) {
+      setMajor('');
+    }
+  };
 
-const filteredStudents = students.filter(s =>
+  const filteredStudents = students.filter(s =>
     s.full_name?.includes(searchQuery) ||
     s.university_id?.includes(searchQuery)
   );
@@ -180,12 +181,12 @@ const filteredStudents = students.filter(s =>
               </div>
             </div>
 
-          <div className="bg-white p-6 rounded-3xl shadow-sm space-y-4">
+            <div className="bg-white p-6 rounded-3xl shadow-sm space-y-4">
               <h3 className="text-xs font-extrabold text-gray-855 pb-2 flex items-center gap-1.5">
                 <User className="h-4.5 w-4.5 text-gray-400" /> البيانات الأكاديمية
               </h3>
 
-         <div className="space-y-1 text-xs font-bold text-gray-700">
+              <div className="space-y-1 text-xs font-bold text-gray-700">
                 <label>الكلية *</label>
                 <select
                   value={college}
@@ -201,21 +202,21 @@ const filteredStudents = students.filter(s =>
                 </select>
               </div>
 
-            <div className="space-y-1 text-xs font-bold text-gray-700">
-              <label>التخصص *</label>
-              <select
-                value={major}
-                onChange={(e) => setMajor(e.target.value)}
-                disabled={!isEditingAcademicInfo || !college}
-                className="w-full p-2.5 bg-gray-50 rounded-2xl border-none font-bold text-gray-750 focus:outline-none font-cairo text-right cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                required
-              >
-                <option value="">{college ? '-- اختر التخصص --' : '-- اختاري الكلية أولاً --'}</option>
-                {(COLLEGE_MAJORS[college] || []).map((m) => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
-            </div>
+              <div className="space-y-1 text-xs font-bold text-gray-700">
+                <label>التخصص *</label>
+                <select
+                  value={major}
+                  onChange={(e) => setMajor(e.target.value)}
+                  disabled={!isEditingAcademicInfo || !college}
+                  className="w-full p-2.5 bg-gray-50 rounded-2xl border-none font-bold text-gray-750 focus:outline-none font-cairo text-right cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  required
+                >
+                  <option value="">{college ? '-- اختر التخصص --' : '-- اختاري الكلية أولاً --'}</option>
+                  {(COLLEGE_MAJORS[college] || []).map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
 
               <div className="flex justify-end gap-2.5 pt-2">
                 {isEditingAcademicInfo ? (
@@ -238,7 +239,7 @@ const filteredStudents = students.filter(s =>
                 )}
               </div>
             </div>
- 
+
             <div className="bg-white p-6 rounded-3xl shadow-sm space-y-4">
               <h3 className="text-xs font-extrabold text-gray-855 pb-2 flex items-center gap-1.5">
                 <UserCheck className="h-4.5 w-4.5 text-gray-400" /> المشرف الأكاديمي الحالي
@@ -303,7 +304,7 @@ const filteredStudents = students.filter(s =>
                       selectedStudentId === s.student_id ? 'bg-purple-50/40 shadow-xs' : ''
                     }`}
                   >
-                 <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <div className="h-7 w-7 bg-brand-purple/10 text-brand-purple font-bold flex items-center justify-center text-xs rounded-full relative">
                         {s.full_name?.charAt(0)}
                         <span className={`absolute -top-0.5 -left-0.5 h-2.5 w-2.5 rounded-full border-2 border-white ${s.supervisor_id ? 'bg-green-500' : 'bg-gray-300'}`} />
